@@ -5,6 +5,13 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 import os
 
+"""
+無環境變數的 handle 沒有寫
+有時間要補上
+"""
+
+
+
 # 指定 gcs-emulator host
 os.environ["STORAGE_EMULATOR_HOST"] = os.getenv("STORAGE_EMULATOR_HOST") # 改成從環境變數讀取，而不是寫死
 
