@@ -6,10 +6,16 @@ from werkzeug.utils import secure_filename
 import os
 
 # 指定 gcs-emulator host
-os.environ["STORAGE_EMULATOR_HOST"] = "http://gcs-emulator.cxcxc.pri:4443"
+os.environ["STORAGE_EMULATOR_HOST"] = os.getenv("STORAGE_EMULATOR_HOST") # 改成從環境變數讀取，而不是寫死
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123456@mysqldb.cxcxc.pri/app1-web'
+
+# 資料庫 URI 資訊
+DB_USERNAME = os.getenv("DB_USERNAME")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_SHCEMA = os.getenv("DB_SCHEMA")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}/{DB_SCHEMA}'
 db = SQLAlchemy(app)
 
 class File(db.Model):
@@ -19,7 +25,7 @@ class File(db.Model):
 
 def store_file_in_gcs(file):
     client = storage.Client(credentials=AnonymousCredentials(), project="test")
-    bucket = client.get_bucket('app1-web-bucket')
+    bucket = client.get_bucket(os.getenv("GCS_BUCKET_NAME")) # 這個需要改嗎？
 
     blob = bucket.blob(file.filename)
     blob.upload_from_string(
@@ -58,4 +64,4 @@ def upload_file():
     '''
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8082, debug=True)
+    app.run(host=os.getenv("FLASK_RUN_HOST", "0.0.0.0"), port=int(os.getenv("FLASK_RUN_PORT"), 8082), debug=bool(os.getenv("FLASK_DEBUG", True)))

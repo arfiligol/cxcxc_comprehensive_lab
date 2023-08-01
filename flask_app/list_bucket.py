@@ -3,18 +3,13 @@ from google.cloud import storage
 
 import os
 # 指定 gcs-emulator host
-os.environ["STORAGE_EMULATOR_HOST"] = "http://gcs-emulator.cxcxc.pri:4443"
+os.environ["STORAGE_EMULATOR_HOST"] = os.getenv("STORAGE_EMULATOR_HOST")
 
 
 client = storage.Client(
     credentials=AnonymousCredentials(),
     project="test",
 )
-
-# # create bucket
-# bucket = client.create_bucket("app1-web-bucket")
-# # delete bucket
-# bucket = client.get_bucket("test-bucket").delete()
 
 # List the Buckets
 for bucket in client.list_buckets():
